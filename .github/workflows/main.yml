@@ -2,7 +2,7 @@ name: Continuous Integration
 
 on:
   pull_request:
-    branches: ["development", "hotfixest", "production", "test"]
+    branches: ["development", "hotfix", "production", "test"]
   push:
     
 jobs:
@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Checkout node modules
+      - name: Cache node modules
         uses: actions/cache@v1
         with:
           path: ~/.npm
@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
         env:
-          ACTIONS_ALLOW_INSECURE_COMMANDS: true
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         
       - name: Clean Install dependencies
         run: npm ci 
@@ -43,5 +43,5 @@ jobs:
       - name: Unity Test 
         run: npm run test
 
-      - name: Prodiction Build 
+      - name: Production Build 
         run: npm run build
