@@ -1,0 +1,47 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches: ["development", "hotfixest", "production", "test"]
+  push:
+    
+jobs:
+  test-app-on-ubuntu:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+        os:
+          - 'ubuntu-18.04'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Checkout node modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node- 
+
+      - name: Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v2.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+        env:
+          ACTIONS_ALLOW_INSECURE_COMMANDS: true
+        
+      - name: Clean Install dependencies
+        run: npm ci 
+
+      - name: Lint Code 
+        run: npm run lint 
+
+      - name: Unity Test 
+        run: npm run test
+
+      - name: Prodiction Build 
+        run: npm run build
